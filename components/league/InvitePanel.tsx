@@ -3,18 +3,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { motion, useReducedMotion } from "framer-motion";
-import { Copy, Mail, QrCode, Share2, Check } from "lucide-react";
+import { Copy, QrCode, Share2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { GlassCard } from "@/components/glass/GlassCard";
 import { cn } from "@/lib/utils";
 
 type InvitePanelProps = {
-  leagueId: string;
   leagueName: string;
   inviteCode: string;
   appUrl?: string;
-  isCommissioner?: boolean;
   className?: string;
 };
 
@@ -22,19 +19,14 @@ type InvitePanelProps = {
 // mobile-first so big buttons are easy to thumb-press. The QR is handy when
 // the whole league is in the same room.
 export function InvitePanel({
-  leagueId,
   leagueName,
   inviteCode,
   appUrl,
-  isCommissioner = false,
   className,
 }: InvitePanelProps) {
   const reduce = useReducedMotion();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [copied, setCopied] = useState<"link" | "code" | null>(null);
-  const [email, setEmail] = useState("");
-  const [emailState, setEmailState] = useState<"idle" | "sending" | "sent" | "error">("idle");
-  const [emailMessage, setEmailMessage] = useState<string | null>(null);
   const [showQR, setShowQR] = useState(false);
 
   const baseUrl = useMemo(() => {
@@ -80,32 +72,6 @@ export function InvitePanel({
       }
     }
     await copy(url, "link");
-  }
-
-  async function sendEmail(e: React.FormEvent) {
-    e.preventDefault();
-    if (!email || emailState === "sending") return;
-    setEmailState("sending");
-    setEmailMessage(null);
-    try {
-      const res = await fetch("/api/league/invite-email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ leagueId, to: email }),
-      });
-      const json = await res.json();
-      if (!res.ok || json.error) {
-        setEmailState("error");
-        setEmailMessage(json.error ?? "Could not send email");
-        return;
-      }
-      setEmailState("sent");
-      setEmailMessage(`Invite sent to ${email}`);
-      setEmail("");
-    } catch (err) {
-      setEmailState("error");
-      setEmailMessage(err instanceof Error ? err.message : "Email failed");
-    }
   }
 
   return (
@@ -215,56 +181,6 @@ export function InvitePanel({
         </motion.div>
       ) : null}
 
-      {/* Email invite (commissioner) */}
-      {isCommissioner ? (
-        <form onSubmit={sendEmail} className="mt-5">
-          <p className="mb-2 text-[10px] uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
-            Email an invite
-          </p>
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <div className="relative flex-1">
-              <Mail className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--color-text-muted)]" />
-              <Input
-                type="email"
-                inputMode="email"
-                autoComplete="email"
-                placeholder="manager@email.com"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setEmailState("idle");
-                  setEmailMessage(null);
-                }}
-                className="h-11 pl-9"
-                aria-label="Recipient email"
-              />
-            </div>
-            <Button
-              type="submit"
-              disabled={!email || emailState === "sending"}
-              className="tap-target h-11 sm:w-32"
-            >
-              {emailState === "sending"
-                ? "Sending…"
-                : emailState === "sent"
-                  ? "Sent"
-                  : "Send invite"}
-            </Button>
-          </div>
-          {emailMessage ? (
-            <p
-              className={cn(
-                "mt-2 text-xs",
-                emailState === "error"
-                  ? "text-[var(--color-accent-danger)]"
-                  : "text-[var(--color-accent-2)]",
-              )}
-            >
-              {emailMessage}
-            </p>
-          ) : null}
-        </form>
-      ) : null}
     </GlassCard>
   );
 }

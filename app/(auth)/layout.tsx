@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { GlassCard } from "@/components/glass/GlassCard";
+import { BackButton } from "@/components/layout/BackButton";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -18,6 +19,13 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         className="pointer-events-none absolute left-1/2 top-1/4 size-[min(90vw,480px)] -translate-x-1/2 rounded-full bg-[var(--color-accent)]/10 blur-[100px] motion-safe:animate-orb-drift"
         aria-hidden
       />
+
+      <div
+        className="absolute left-4 top-4 z-20 sm:left-6 sm:top-6"
+        style={{ paddingTop: "max(env(safe-area-inset-top, 0px), 0px)" }}
+      >
+        <BackButton href="/" label="Home" />
+      </div>
 
       <motion.div
         initial={reduce ? undefined : { opacity: 0, y: 24, scale: 0.97, filter: "blur(10px)" }}

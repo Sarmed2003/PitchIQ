@@ -4,22 +4,22 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* -------------------------------------------------------------------------- */
-/* Typography — Apple system stack for body; broadcast condensed for display  */
-/* -------------------------------------------------------------------------- */
+/* Typography. SF on Apple devices, Inter / Inter Tight everywhere else.    */
 :root {
   --font-stack-sf:
-    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui,
-    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+    var(--font-inter), system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    sans-serif;
   --font-stack-sf-display:
-    -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui,
-    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+    var(--font-inter-tight), var(--font-inter), system-ui, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
   --font-stack-sf-mono:
     ui-monospace, "SF Mono", "Cascadia Mono", "Segoe UI Mono", Menlo, Monaco, Consolas,
     monospace;
   --font-stack-broadcast:
-    "SF Pro Display", "Helvetica Neue Condensed", "Helvetica Neue",
-    "Arial Narrow", "Roboto Condensed", system-ui, sans-serif;
+    "SF Pro Display", var(--font-inter-tight), "Helvetica Neue Condensed",
+    "Helvetica Neue", "Arial Narrow", "Roboto Condensed", system-ui, sans-serif;
 
   /* Luxury soccer-club palette: midnight pitch, off-white, champagne, emerald */
   --color-pitch: #060a13;

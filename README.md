@@ -13,10 +13,11 @@ The app is mobile-first and installs as a PWA, so you can add it to your home sc
 - **Waivers.** Add/drop claims with reverse-standings priority by default, FAAB optional. A cron processes them on Wednesday morning.
 - **Trades.** Propose trades, the other manager accepts or rejects, league members can see what's pending.
 - **Live.** A persistent ticker across the app shows what's happening in matches that affect your team.
+- **Coach.** A floating AI assistant available on every page. Knows your roster, your league standings, and the rules — useful both for new players figuring out the sport and for veterans deciding who to captain.
 
 ## What's still on the roadmap
 
-- AI draft assistant (suggest picks based on your queue, league trends, and projections).
+- Transactional email for league invites (Resend or similar — the UI already supports invites via link/QR/native share).
 - Stripe-backed prize pools.
 - Real Web Push notifications (the plumbing is in place, the VAPID side isn't).
 - Native iOS / Android wrappers — the PWA covers most of this for now.
@@ -40,7 +41,10 @@ A short note on each piece and what it earns its keep doing:
 - **Postgres + Row Level Security** — every table has RLS policies. League members can read what they should, commissioners can write what they should, nobody else gets to peek. The scoring engine and cron jobs use the service-role key, but only on the server.
 - **Upstash Redis** — fast key-value store for rate limiting (per-user lineup edits, sync calls, waiver claims) and as a regional cache for read-heavy match-day endpoints. We picked it because it's HTTP-based, so it works from edge runtimes.
 - **api-football (api-sports.io)** — the football data feed. We hit it from a commissioner-triggered sync route and a cron, never from the client. The provider lives behind an interface in `lib/football/provider.ts` so we can swap to Sportmonks or Stats Perform without touching anything else.
-- **Resend** — transactional email for league invites and notifications. Cheap, has a usable React-email-ish API, plays well with Vercel.
+
+### AI
+
+- **Vercel AI Gateway + AI SDK v6** — Coach (the floating assistant) runs through Vercel's gateway, so we get a single API key, automatic failover between providers, and cost tracking out of the box. The AI SDK gives us streaming, tool calling, and a clean React hook (`useChat`). Coach has access to a tool kit (`getMyLeagues`, `getMyTeam`, `getFreeAgents`, `getLeagueStandings`, `suggestCaptain`, `explainRules`) so its answers are grounded in the user's actual data rather than guessing.
 
 ### Infra / ops
 
@@ -56,7 +60,7 @@ A short note on each piece and what it earns its keep doing:
 
 ## Getting it running
 
-You'll need a Supabase project, the football and Resend keys, and an Upstash Redis instance. There's a `.env.local.example` with everything that needs to be set.
+You'll need a Supabase project, an api-football key, an Upstash Redis instance, and a Vercel AI Gateway key. There's a `.env.local.example` with everything that needs to be set.
 
 ```bash
 cd pitchiq
@@ -116,13 +120,15 @@ pitchiq/
     players/            # jersey token, player card
     team/               # pitch visualizer, lineup editor
     waivers/            # waiver claim list / button
+    assistant/          # Coach chat bubble + panel
   hooks/                # presence, turn alerts
   lib/
+    ai/                 # system prompt + Coach tool definitions
     clubs/              # PL club color palettes
     draft/              # snake draft engine, scoring, queue
     football/           # provider abstraction (api-football today)
     lineup/             # zod schema + formation rules
-    notifications/      # in-app + email fan-out
+    notifications/      # in-app fan-out
     queries/            # TanStack Query fetchers
     supabase/           # browser, server, admin, middleware clients
     upstash.ts          # cache + rate limiting

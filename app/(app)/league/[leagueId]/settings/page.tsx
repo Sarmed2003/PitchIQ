@@ -62,11 +62,9 @@ export default async function LeagueSettingsPage({
 
         <div className="space-y-4 lg:space-y-6">
           <InvitePanel
-            leagueId={leagueId}
             leagueName={league.name}
             inviteCode={league.invite_code ?? ""}
             appUrl={process.env.NEXT_PUBLIC_APP_URL}
-            isCommissioner
           />
 
           <GlassCard className="relative overflow-hidden p-5 sm:p-6">

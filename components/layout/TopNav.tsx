@@ -12,13 +12,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { BackButton } from "@/components/layout/BackButton";
 
 // Sticky header. On mobile we show the wordmark plus notifications and the
 // account menu; on desktop the sidebar already brands the page so we strip
 // it back to just the right-side actions.
 export function TopNav() {
   const router = useRouter();
+  const pathname = usePathname();
+  // Dashboard is the "home" of the authed app, so a back button there is
+  // confusing. Everywhere else gets one.
+  const showBack = pathname !== "/dashboard" && pathname !== "/";
 
   const { data: notifData } = useQuery({
     queryKey: ["notifications-header"],
@@ -44,12 +49,15 @@ export function TopNav() {
       className="sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b border-[var(--color-glass-border)]/80 bg-[color-mix(in_oklab,var(--color-pitch)_82%,transparent)] px-3 backdrop-blur-2xl sm:px-4"
       style={{ paddingTop: "max(env(safe-area-inset-top, 0px), 0px)" }}
     >
-      <Link
-        href="/dashboard"
-        className="font-display text-base font-semibold tracking-tight lg:hidden"
-      >
-        <span className="gold-shine">PitchIQ</span>
-      </Link>
+      <div className="flex items-center gap-2">
+        {showBack ? <BackButton fallbackHref="/dashboard" /> : null}
+        <Link
+          href="/dashboard"
+          className="font-display text-base font-semibold tracking-tight lg:hidden"
+        >
+          <span className="gold-shine">PitchIQ</span>
+        </Link>
+      </div>
       <div className="flex flex-1 items-center justify-end gap-1">
         <Link
           href="/dashboard#notifications"

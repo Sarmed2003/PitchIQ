@@ -1,4 +1,3 @@
-import { sendTransactionalEmail } from "@/lib/resend";
 import { logger } from "@/lib/logger";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database.types";
@@ -9,16 +8,10 @@ type NotifyArgs = {
   title: string;
   body?: string;
   metadata?: Record<string, unknown>;
-  email?: {
-    to: string;
-    subject: string;
-    html: string;
-  };
 };
 
-// One place to fan out a notification to all channels (in-app row, optional
-// email). Web Push will plug in here once we ship it. Email is best-effort:
-// if Resend is down the in-app row still goes through.
+// Writes an in-app notification row. Email + Web Push will plug in here
+// when we wire those channels up later.
 export async function notify(
   supabase: SupabaseClient<Database>,
   args: NotifyArgs,
@@ -33,16 +26,8 @@ export async function notify(
 
   if (insertErr) {
     logger.warn("notify: insert failed", insertErr);
+    return { ok: false, error: insertErr.message };
   }
 
-  if (args.email) {
-    try {
-      const r = await sendTransactionalEmail(args.email);
-      if (!r.ok) logger.warn("notify: email failed", r.error);
-    } catch (e) {
-      logger.warn("notify: email threw", e);
-    }
-  }
-
-  return { ok: !insertErr };
+  return { ok: true };
 }

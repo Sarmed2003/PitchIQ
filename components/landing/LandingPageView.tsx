@@ -130,12 +130,6 @@ export function LandingPageView() {
                 </AuthNavTransitionLink>
               </motion.div>
 
-              <motion.p
-                variants={heroItem}
-                className="mt-8 font-mono text-xs text-[var(--color-text-hint)]"
-              >
-                No credit card · Built for mini-leagues
-              </motion.p>
             </GlassCard>
           </motion.div>
         </section>

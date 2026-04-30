@@ -164,11 +164,9 @@ export default async function LeagueHomePage({
         </GlassCard>
 
         <InvitePanel
-          leagueId={leagueId}
           leagueName={league.name}
           inviteCode={league.invite_code ?? ""}
           appUrl={appUrl}
-          isCommissioner={isCommissioner}
         />
       </div>
     </div>

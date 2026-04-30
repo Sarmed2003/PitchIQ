@@ -2,6 +2,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { TopNav } from "@/components/layout/TopNav";
 import { MobileTabBar } from "@/components/layout/MobileTabBar";
 import { LiveScoreBar } from "@/components/scoring/LiveScoreBar";
+import { Assistant } from "@/components/assistant/Assistant";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -17,6 +18,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </main>
         <MobileTabBar />
       </div>
+      <Assistant />
     </div>
   );
 }
