@@ -9,10 +9,23 @@ import { AuthNavTransitionLink } from "@/components/landing/AuthNavTransitionLin
 
 const easeApple = [0.16, 1, 0.3, 1] as const;
 
+// The hero card drops in from off-screen first, then its inner pieces stagger
+// in once the card has landed. delayChildren matches the parent drop duration.
+const heroDropMotion = {
+  hidden: { opacity: 0, y: -260, scale: 0.92, filter: "blur(20px)" },
+  show: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    filter: "blur(0px)",
+    transition: { duration: 0.95, ease: easeApple },
+  },
+};
+
 const heroContainerMotion = {
   hidden: {},
   show: {
-    transition: { staggerChildren: 0.09, delayChildren: 0.12 },
+    transition: { staggerChildren: 0.09, delayChildren: 0.6 },
   },
 };
 
@@ -84,11 +97,16 @@ export function LandingPageView() {
           />
 
           <motion.div
-            variants={heroContainer}
+            variants={reduce ? heroInstant : heroDropMotion}
             initial="hidden"
             animate="show"
             className="relative z-10 w-full max-w-3xl"
           >
+            <motion.div
+              variants={heroContainer}
+              initial="hidden"
+              animate="show"
+            >
             <GlassCard className="relative overflow-hidden p-8 text-center sm:p-12">
               <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--color-accent)]/50 to-transparent" />
 
@@ -131,6 +149,7 @@ export function LandingPageView() {
               </motion.div>
 
             </GlassCard>
+            </motion.div>
           </motion.div>
         </section>
 
