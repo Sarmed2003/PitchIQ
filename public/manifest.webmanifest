@@ -1,0 +1,31 @@
+{
+  "name": "PitchIQ — Fantasy football, redrawn.",
+  "short_name": "PitchIQ",
+  "description": "Luxury fantasy Premier League workspace with live drafts and broadcast-grade lineups.",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#060a13",
+  "theme_color": "#060a13",
+  "categories": ["sports", "social", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    { "name": "Open dashboard", "url": "/dashboard" },
+    { "name": "Players", "url": "/players" },
+    { "name": "Trades", "url": "/trades" }
+  ]
+}

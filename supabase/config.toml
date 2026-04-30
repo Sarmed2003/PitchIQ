@@ -1,0 +1,8 @@
+# Minimal config for local CLI / link. Adjust project_id after `supabase link`.
+project_id = "nvzuljyfwkonanfgkxfr"
+
+[api]
+enabled = true
+
+[db]
+major_version = 17

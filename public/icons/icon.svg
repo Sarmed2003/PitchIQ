@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="PitchIQ">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="80%">
+      <stop offset="0%" stop-color="#1a2238"/>
+      <stop offset="100%" stop-color="#060a13"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#efd9a3"/>
+      <stop offset="100%" stop-color="#d4b676"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <!-- Pitch lines -->
+  <g stroke="rgba(212,182,118,0.18)" stroke-width="3" fill="none">
+    <circle cx="256" cy="256" r="86"/>
+    <line x1="64" y1="256" x2="448" y2="256"/>
+    <rect x="64" y="160" width="80" height="192" rx="4"/>
+    <rect x="368" y="160" width="80" height="192" rx="4"/>
+  </g>
+  <!-- "P" wordmark -->
+  <text
+    x="256" y="320"
+    text-anchor="middle"
+    font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif"
+    font-weight="800"
+    font-size="260"
+    fill="url(#gold)"
+    letter-spacing="-12"
+  >P</text>
+  <!-- Accent dot -->
+  <circle cx="368" cy="148" r="14" fill="#2ee6b3"/>
+</svg>
