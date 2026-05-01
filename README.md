@@ -1,8 +1,10 @@
 # PitchIQ
 
+**Live:** [pitchiq-gilt.vercel.app](https://pitchiq-gilt.vercel.app)
+
 PitchIQ is a fantasy Premier League draft app. It does the things FPL's draft mode does — snake drafts, weekly lineups with a captain, head-to-head matchups, waivers, trades — but with a UI that actually feels like watching the sport instead of filling out a tax return.
 
-The app is mobile-first and installs as a PWA, so you can add it to your home screen and run a league from your phone.
+The app is mobile-first and installs as a PWA, so you can add it to your home screen and run a league from your phone. There's also an AI assistant (Coach) baked into every page that knows your team and the rules.
 
 ## What it does
 
@@ -14,6 +16,45 @@ The app is mobile-first and installs as a PWA, so you can add it to your home sc
 - **Trades.** Propose trades, the other manager accepts or rejects, league members can see what's pending.
 - **Live.** A persistent ticker across the app shows what's happening in matches that affect your team.
 - **Coach.** A floating AI assistant available on every page. Knows your roster, your league standings, and the rules — useful both for new players figuring out the sport and for veterans deciding who to captain.
+
+## Coach — the AI assistant
+
+Coach lives in a floating bubble bottom-right of every authenticated page and stays mounted across navigation, so the conversation survives moving between routes. The avatar is a soccer ball with a flame trail.
+
+It's there for two audiences:
+
+1. **People new to fantasy football.** "What's a snake draft?", "How do waivers work?", "What does a captain do?" — Coach answers in plain English without the jargon.
+2. **Experienced managers who want a second opinion.** "Who should I captain this week?", "Top free agents at midfield?", "Who's my worst lineup option?" — Coach reads your actual roster, form, and league context to recommend.
+
+Under the hood Coach uses a small toolbox to look up real data instead of guessing:
+
+| Tool | What it does |
+|---|---|
+| `getMyLeagues` | Lists every league the current user is in, with their team in each one. |
+| `getMyTeam` | Returns a team's full roster — players, positions, total points, form, injury status. |
+| `getFreeAgents` | Top available players in a league, optionally filtered by position. |
+| `getLeagueStandings` | Current table for a league (rank, total points, last gameweek). |
+| `suggestCaptain` | Ranks the top three captain candidates from your roster by form + points. |
+| `explainRules` | Plain-English breakdowns of draft, scoring, captain, waivers, trades, lineups, chips. |
+
+Every call goes through the user's authenticated Supabase client, so RLS naturally scopes results to leagues and teams the user actually belongs to. The chat itself is rate-limited (30 messages / 5 minutes per user) so a stuck client can't burn gateway credit.
+
+### How it's wired
+
+- **Provider routing**: [Vercel AI Gateway](https://vercel.com/docs/ai-gateway). One env var (`AI_GATEWAY_API_KEY`) gives us access to OpenAI, Anthropic, Google, and others through a single API. Default model is `openai/gpt-5.4-mini` — cheap, fast, supports tool calling. Swap by changing the `MODEL` constant in `app/api/assistant/route.ts`.
+- **Streaming**: AI SDK v6 (`streamText` + `toUIMessageStreamResponse`) on the server, `useChat` from `@ai-sdk/react` on the client.
+- **Tool loop**: capped at 5 steps via `stopWhen: stepCountIs(5)` so a stuck tool call can't spiral.
+- **System prompt**: short and pragmatic — lives at `lib/ai/system-prompt.ts`. It tells Coach to use tools before giving advice, never invent stats, and keep responses tight.
+
+### Files
+
+```
+app/api/assistant/route.ts        # streamText + tools + auth + rate limit
+components/assistant/Assistant.tsx # bubble + chat panel + quick prompts
+lib/ai/system-prompt.ts            # what Coach is and isn't
+lib/ai/tools.ts                    # the toolbox above
+public/assistant/coach.png         # avatar
+```
 
 ## What's still on the roadmap
 
@@ -44,7 +85,7 @@ A short note on each piece and what it earns its keep doing:
 
 ### AI
 
-- **Vercel AI Gateway + AI SDK v6** — Coach (the floating assistant) runs through Vercel's gateway, so we get a single API key, automatic failover between providers, and cost tracking out of the box. The AI SDK gives us streaming, tool calling, and a clean React hook (`useChat`). Coach has access to a tool kit (`getMyLeagues`, `getMyTeam`, `getFreeAgents`, `getLeagueStandings`, `suggestCaptain`, `explainRules`) so its answers are grounded in the user's actual data rather than guessing.
+- **Vercel AI Gateway + AI SDK v6** — Coach runs through Vercel's gateway, so we get a single API key, automatic provider failover, and cost tracking. The AI SDK handles streaming, tool calling, and the React hook (`useChat`) the chat panel is built on. See the dedicated [Coach](#coach--the-ai-assistant) section above for the tool list and rationale.
 
 ### Infra / ops
 
