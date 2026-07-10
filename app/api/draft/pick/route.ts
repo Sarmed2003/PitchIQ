@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
             teamList.map((t) => ({ id: t.id, draft_position: t.draft_position })),
           );
 
-    const expectedTeam = teamIdForPick(session.current_pick, n, order);
+    const expectedTeam = teamIdForPick(session.current_pick ?? 0, n, order);
     if (!expectedTeam) {
       return NextResponse.json(fail("Invalid draft state", 500), { status: 500 });
     }
@@ -81,13 +81,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(fail("Player already drafted", 400), { status: 400 });
     }
 
-    const round = Math.ceil(session.current_pick / n);
+    const currentPick = session.current_pick ?? 1;
+    const round = Math.ceil(currentPick / n);
     const { error: pErr } = await admin.from("draft_picks").insert({
       draft_session_id: session.id,
       league_id: body.leagueId,
       team_id: expectedTeam,
       player_id: body.playerId,
-      pick_number: session.current_pick,
+      pick_number: currentPick,
       round,
     });
 
@@ -95,8 +96,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(fail(pErr.message, 400), { status: 400 });
     }
 
-    const totalPicks = n * league.roster_size;
-    const nextPick = session.current_pick + 1;
+    const totalPicks = n * (league.roster_size ?? 15);
+    const nextPick = currentPick + 1;
 
     if (nextPick > totalPicks) {
       await admin

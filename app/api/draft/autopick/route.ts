@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
             teamList.map((t) => ({ id: t.id, draft_position: t.draft_position })),
           );
 
-    const expectedTeam = teamIdForPick(session.current_pick, n, order);
+    const expectedTeam = teamIdForPick(session.current_pick ?? 0, n, order);
     if (!expectedTeam) {
       return NextResponse.json(fail("Invalid draft state", 500), { status: 500 });
     }

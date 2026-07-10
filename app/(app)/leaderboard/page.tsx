@@ -43,9 +43,9 @@ export default async function LeaderboardPage() {
       rows = (teamRows ?? []).map((t) => ({
         id: t.id,
         team_name: t.team_name,
-        total_points: t.total_points,
-        gameweek_points: t.gameweek_points,
-        league_name: leagueNameById.get(t.league_id) ?? "—",
+        total_points: t.total_points ?? 0,
+        gameweek_points: t.gameweek_points ?? 0,
+        league_name: (t.league_id && leagueNameById.get(t.league_id)) || "—",
       }));
     }
   }

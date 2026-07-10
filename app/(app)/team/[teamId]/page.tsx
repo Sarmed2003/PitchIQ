@@ -27,6 +27,7 @@ export default async function TeamPage({
     .eq("id", teamId)
     .maybeSingle();
   if (!team) notFound();
+  if (!team.league_id) notFound();
 
   const { data: leagueRow } = await supabase
     .from("leagues")

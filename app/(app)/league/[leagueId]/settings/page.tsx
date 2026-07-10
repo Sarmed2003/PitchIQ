@@ -53,10 +53,10 @@ export default async function LeagueSettingsPage({
       <div className="grid gap-4 lg:grid-cols-2 lg:gap-6">
         <LeagueSettingsForm
           leagueId={leagueId}
-          maxTeams={league.max_teams}
-          rosterSize={league.roster_size}
+          maxTeams={league.max_teams ?? 10}
+          rosterSize={league.roster_size ?? 15}
           tradeDeadline={league.trade_deadline}
-          waiverType={league.waiver_type}
+          waiverType={league.waiver_type ?? "reverse_standings"}
           scoring={{ ...DEFAULT_SCORING_SYSTEM, ...scoring }}
         />
 

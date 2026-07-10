@@ -83,6 +83,8 @@ export async function POST(req: Request) {
   if (!team) return NextResponse.json({ error: "Team not found" }, { status: 404 });
   if (team.user_id !== user.id)
     return NextResponse.json({ error: "Not your team" }, { status: 403 });
+  if (!team.league_id)
+    return NextResponse.json({ error: "Team missing league" }, { status: 400 });
 
   // Can't claim someone already rostered — they'd need a trade instead.
   const { data: rostered } = await supabase

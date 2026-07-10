@@ -10,9 +10,9 @@ type PlayerRow = {
   club: string;
   club_short: string | null;
   position: string | null;
-  form: string;
-  total_points: number;
-  injury_status: string;
+  form: number | null;
+  total_points: number | null;
+  injury_status: string | null;
   photo_url: string | null;
   shirt_number: number | null;
 };

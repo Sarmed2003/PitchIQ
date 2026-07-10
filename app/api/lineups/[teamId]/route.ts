@@ -23,6 +23,7 @@ export async function GET(_req: Request, { params }: Params) {
     .eq("id", teamId)
     .maybeSingle();
   if (!team) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!team.league_id) return NextResponse.json({ error: "Team missing league" }, { status: 400 });
 
   const { data: league } = await supabase
     .from("leagues")
@@ -63,6 +64,8 @@ export async function PUT(req: Request, { params }: Params) {
   if (!team) return NextResponse.json({ error: "Not found" }, { status: 404 });
   if (team.user_id !== user.id)
     return NextResponse.json({ error: "Only the team owner can edit lineups" }, { status: 403 });
+  if (!team.league_id)
+    return NextResponse.json({ error: "Team missing league" }, { status: 400 });
 
   // 30 saves / 5 min is plenty for normal use and stops a stuck client from
   // hammering Postgres.

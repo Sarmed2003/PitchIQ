@@ -27,9 +27,7 @@ export function buildAssistantTools(
             teamId: t.id,
             teamName: t.team_name,
             leagueId: t.league_id,
-            // @ts-expect-error supabase typing doesn't infer the join cleanly
             leagueName: t.leagues?.name ?? "(unknown)",
-            // @ts-expect-error see above
             status: t.leagues?.status ?? null,
           })),
         };

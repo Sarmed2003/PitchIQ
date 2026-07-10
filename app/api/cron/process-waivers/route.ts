@@ -44,7 +44,7 @@ export async function GET(req: Request) {
     const sortedTeams = (teams ?? [])
       .slice()
       .sort((a, b) => {
-        if (a.rank == null && b.rank == null) return a.total_points - b.total_points;
+        if (a.rank == null && b.rank == null) return (a.total_points ?? 0) - (b.total_points ?? 0);
         if (a.rank == null) return -1;
         if (b.rank == null) return 1;
         return b.rank - a.rank; // worst rank first (highest rank number)
@@ -76,7 +76,7 @@ export async function GET(req: Request) {
         const br = teamRank.get(b.team_id) ?? 999;
         if (ar !== br) return ar - br;
         if (a.priority !== b.priority) return a.priority - b.priority;
-        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        return new Date(a.created_at ?? 0).getTime() - new Date(b.created_at ?? 0).getTime();
       });
 
       const winner = sorted[0];

@@ -29,6 +29,7 @@ export default async function LineupPage({
   if (team.user_id !== user.id) {
     redirect(`/team/${teamId}`);
   }
+  if (!team.league_id) notFound();
 
   const { data: league } = await supabase
     .from("leagues")

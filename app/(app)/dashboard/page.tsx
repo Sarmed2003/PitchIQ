@@ -120,6 +120,7 @@ export default async function DashboardPage() {
           ) : (
             <ul className="mt-4 space-y-2">
               {(teams ?? []).map((t) => {
+                if (!t.league_id) return null;
                 const league = leagueById.get(t.league_id);
                 const isCommissioner = league?.commissioner_id === user.id;
                 return (
