@@ -1,8 +1,12 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { usePathname } from "next/navigation";
 
+// Per-route mount animation. No AnimatePresence + mode="wait", because that
+// combo gets stuck against Next.js App Router: the exit animation drives
+// opacity to 0 on the old subtree, the new subtree mounts before Framer sees
+// it, and the enter frame never fires — leaving the page blank.
 export function RootPageTemplate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const reduce = useReducedMotion();
@@ -12,20 +16,14 @@ export function RootPageTemplate({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AnimatePresence mode="wait" initial={false}>
-      <motion.div
-        key={pathname}
-        initial={{ opacity: 0.001, scale: 0.992, filter: "blur(12px)" }}
-        animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-        exit={{ opacity: 0, scale: 1.008, filter: "blur(10px)" }}
-        transition={{
-          duration: 0.42,
-          ease: [0.16, 1, 0.3, 1],
-        }}
-        className="min-h-dvh will-change-[opacity,transform,filter]"
-      >
-        {children}
-      </motion.div>
-    </AnimatePresence>
+    <motion.div
+      key={pathname}
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+      className="min-h-dvh"
+    >
+      {children}
+    </motion.div>
   );
 }
