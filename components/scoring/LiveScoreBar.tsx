@@ -15,8 +15,6 @@ type ScoresPayload = {
   updatedAt: string;
 };
 
-// Sticky scoreboard ticker. Disappears entirely when no fixtures are loaded
-// so we don't reserve dead space.
 export function LiveScoreBar() {
   const { data } = useQuery({
     queryKey: ["live-scores"],

@@ -111,15 +111,12 @@ export function DraftRoom({ leagueId }: { leagueId: string }) {
   const myTurn = onClock && myTeam?.id === onClock;
   const isCommissioner = userId === commissionerId;
 
-  // Persist + load my watchlist/queue when team is known.
   useEffect(() => {
     if (myTeam?.id) setQueueIds(getQueue(myTeam.id));
   }, [myTeam?.id]);
 
-  // Audio + tab-title flash when it's my pick.
   useTurnAlert(!!myTurn && session?.status === "active");
 
-  // Live presence in the draft room.
   const presence = useDraftPresence(
     leagueId,
     userId ? { user_id: userId, display_name: displayName } : null,

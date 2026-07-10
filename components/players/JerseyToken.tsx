@@ -17,8 +17,6 @@ type JerseySize = "xs" | "sm" | "md" | "lg";
 
 type JerseyTokenProps = {
   club?: string | null;
-  // Last name across the shoulders; number underneath. GK uses the keeper
-  // colorway (desaturated + reversed accent).
   name?: string | null;
   number?: number | string | null;
   isGoalkeeper?: boolean;
@@ -35,8 +33,6 @@ const SIZES: Record<JerseySize, { box: number; nameSize: number; numSize: number
   lg: { box: 160, nameSize: 16, numSize: 64, trim: 3.6 },
 };
 
-// Player avatar styled like a TV broadcast jersey. Inline SVG so it scales
-// without aliasing and we can recolor it per club at runtime.
 function JerseyTokenInner({
   club,
   name,
@@ -50,7 +46,6 @@ function JerseyTokenInner({
   const palette = getClubPalette(club);
   const dims = SIZES[size];
 
-  // GK kit inverts colors (broadcast convention: keeper stands out).
   const primary = isGoalkeeper ? palette.secondary : palette.primary;
   const secondary = isGoalkeeper ? palette.primary : palette.secondary;
   const textColor = palette.text;

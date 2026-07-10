@@ -166,12 +166,9 @@ export function LineupEditor({
       }
       setStarterIds((prev) => prev.map((id) => (id === a ? b : id === b ? a : id)));
       setBenchIds((prev) => prev.map((id) => (id === a ? b : id === b ? a : id)));
-      // If the captain or vice gets benched in the swap, clear the role.
+      // Captain / vice cleared if the player they belonged to just got benched.
       if (captainId === a && !starterIds.includes(b)) setCaptainId(null);
       if (viceId === a && !starterIds.includes(b)) setViceId(null);
-      if (captainId === b && !benchIds.includes(a)) {
-        // moved captain on → keep captainId as-is
-      }
       setSwapTarget(null);
     },
     [swapTarget, byId, captainId, viceId, starterIds, benchIds],
@@ -204,14 +201,13 @@ export function LineupEditor({
     if (locked) return;
     setSaved(false);
     setError(null);
-    // Re-pick a valid 11 from current 15 by position counts.
     const wanted = FORMATION_COUNTS[next];
     const all = roster.slice();
     const pickByPos = (pos: "GK" | "DEF" | "MID" | "FWD", n: number) => {
       const inPos = all
         .filter((p) => p.position === pos)
         .sort((a, b) => {
-          // prefer current starters, then by points
+          // current starters first, then by points
           const aStart = starterIds.includes(a.id) ? 1 : 0;
           const bStart = starterIds.includes(b.id) ? 1 : 0;
           if (aStart !== bStart) return bStart - aStart;

@@ -7,9 +7,6 @@ import { ServiceWorkerRegister } from "@/components/providers/sw-register";
 import { PostHogProvider } from "@/components/providers/posthog-provider";
 import { MotionProvider } from "@/components/providers/motion-provider";
 
-// Inter for body text and Inter Tight for display. Both are open-licensed
-// SF-inspired typefaces, so non-Apple devices get the same look macOS / iOS
-// already give us through the system stack.
 const interSans = Inter({
   subsets: ["latin"],
   display: "swap",

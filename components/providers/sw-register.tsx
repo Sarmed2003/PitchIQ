@@ -2,8 +2,7 @@
 
 import { useEffect } from "react";
 
-// Production-only SW registration. Skipped in dev so HMR isn't fighting a
-// cached bundle.
+// Registers /sw.js in production only. Dev skips it to keep HMR clean.
 export function ServiceWorkerRegister() {
   useEffect(() => {
     if (typeof window === "undefined") return;

@@ -15,9 +15,6 @@ type InvitePanelProps = {
   className?: string;
 };
 
-// Invite UI: copy code, copy link, native share-sheet, QR, email. Designed
-// mobile-first so big buttons are easy to thumb-press. The QR is handy when
-// the whole league is in the same room.
 export function InvitePanel({
   leagueName,
   inviteCode,

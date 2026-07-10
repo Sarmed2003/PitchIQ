@@ -3,10 +3,9 @@ import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database.types";
 
-// Builds the Coach toolbox for a specific user. Every tool runs through their
-// Supabase client, so RLS automatically scopes results to leagues/teams they
-// actually belong to. The model can call any of these — descriptions are
-// what it reads to decide which one to reach for.
+// Tool set exposed to the AI assistant. Each tool queries through the
+// caller's Supabase client, so RLS scopes results to leagues/teams the
+// user belongs to.
 export function buildAssistantTools(
   supabase: SupabaseClient<Database>,
   userId: string,
@@ -49,8 +48,6 @@ export function buildAssistantTools(
         if (tErr || !team) return { error: tErr?.message ?? "Team not found" };
         if (team.user_id !== userId) return { error: "Not your team" };
 
-        // Two-step fetch instead of a join because Supabase's generated types
-        // don't recognize the roster_slots → players FK in this codebase.
         const { data: slots, error: sErr } = await supabase
           .from("roster_slots")
           .select("player_id")
@@ -96,8 +93,6 @@ export function buildAssistantTools(
         limit: z.number().min(1).max(20).default(10),
       }),
       execute: async ({ leagueId, position, limit }) => {
-        // Find every player already rostered in this league (two-step to dodge
-        // the supabase typegen quirk).
         const { data: leagueTeams } = await supabase
           .from("teams")
           .select("id")

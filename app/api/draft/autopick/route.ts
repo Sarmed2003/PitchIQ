@@ -78,13 +78,13 @@ export async function POST(request: NextRequest) {
 
     let candidate: { id: number } | null = null;
 
-    // 1. Honor the manager's queued picks first (highest priority first).
+    // Client-side queue wins if it has a match still on the board.
     if (queue && queue.length > 0) {
       const inQueue = queue.find((id) => !exclude.has(id));
       if (inQueue != null) candidate = { id: inQueue };
     }
 
-    // 2. Fallback: best remaining player by VOR if available, else total_points.
+    // Fallback: rank by VOR + total_points + form.
     if (!candidate) {
       const { data: pool } = await admin
         .from("players")

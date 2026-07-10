@@ -5,9 +5,8 @@ import { readGameweekFromSettings } from "@/lib/gameweek";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// Stamps `locked_at` on any lineup whose league deadline has passed so the
-// PUT route refuses further edits. Vercel Cron hits this every 5 minutes.
-// Requires the CRON_SECRET bearer token.
+// Stamps `locked_at` on any lineup whose league deadline has passed.
+// Ran by Vercel Cron every 5 minutes; requires the CRON_SECRET bearer token.
 export async function GET(req: Request) {
   const auth = req.headers.get("authorization") ?? "";
   const expected = `Bearer ${process.env.CRON_SECRET ?? ""}`;

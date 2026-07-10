@@ -1,13 +1,11 @@
-// Club kit colors used by JerseyToken and the various accent gradients. Keys
-// are the common short codes (ARS, MUN, …); getClubPalette below normalizes
-// whatever string we find in the players table.
+// Club kit colors keyed by short code. getClubPalette below normalizes
+// whatever string arrives from the players table.
 
 export type ClubPalette = {
   short: string;
   name: string;
   primary: string;
   secondary: string;
-  // Color for text printed on the primary fill (shirt name + number).
   text: string;
 };
 

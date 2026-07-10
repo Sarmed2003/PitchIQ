@@ -66,9 +66,6 @@ type PitchProps = {
   onSlotTap?: (slotId: string) => void;
 };
 
-// Top-down pitch SVG with painted lines and a jersey at every slot. The
-// tokens are absolutely positioned over the SVG so the formation can change
-// without re-rendering the grass.
 export function PitchVisualizer({
   starters,
   formation = "4-4-2",

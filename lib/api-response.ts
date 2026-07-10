@@ -1,5 +1,4 @@
-// Common envelope every route handler returns so the client side can branch
-// on `ok` instead of inspecting status codes everywhere.
+// Standard envelope for every JSON route handler.
 export type ApiResponse<T> = {
   data: T | null;
   error: string | null;

@@ -12,9 +12,8 @@ type PlayerInsert = Database["public"]["Tables"]["players"]["Insert"];
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-// Pulls fresh player data from the football provider and upserts into Postgres.
-// Commissioner-only, capped at 2 runs/day per user via Upstash so the free
-// api-football quota survives the season.
+// Commissioner-triggered player upsert from the football provider.
+// Capped at 2 runs/day per user to protect the api-football quota.
 export async function POST() {
   try {
     const supabase = await createServerSupabaseClient();
@@ -25,7 +24,6 @@ export async function POST() {
       return NextResponse.json(fail("Unauthorized", 401), { status: 401 });
     }
 
-    // Must run a league to trigger this.
     const { count: commishCount } = await supabase
       .from("leagues")
       .select("id", { count: "exact", head: true })
@@ -38,7 +36,6 @@ export async function POST() {
       );
     }
 
-    // Free api-football plans give 100 req/day; full sync uses ~50 of those.
     const rl = await checkRateLimit(user.id, {
       key: "sync:players",
       limit: 2,

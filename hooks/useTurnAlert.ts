@@ -2,9 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-// Beeps once and flashes the tab title when `active` flips on. Helps when
-// the manager has the draft tab in the background — they get an actual cue
-// instead of missing the clock.
+// One beep + flashing tab title on the rising edge of `active`.
 export function useTurnAlert(active: boolean, label = "🟢 Your pick — PitchIQ") {
   const wasActive = useRef(false);
   const originalTitle = useRef<string | null>(null);
@@ -25,7 +23,7 @@ export function useTurnAlert(active: boolean, label = "🟢 Your pick — PitchI
         gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.4);
         osc.stop(ctx.currentTime + 0.4);
       } catch {
-        // No audio context (Safari before first interaction, etc) — skip it.
+        // AudioContext unavailable (e.g. Safari pre-interaction).
       }
 
       if (originalTitle.current === null) originalTitle.current = document.title;

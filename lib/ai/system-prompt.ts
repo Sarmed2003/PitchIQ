@@ -1,6 +1,3 @@
-// The system prompt is the assistant's personality, scope, and rulebook.
-// We keep it concise on purpose — long prompts make tool-calling models lazy
-// about actually calling the tools.
 export const SYSTEM_PROMPT = `You are Coach, the in-app companion for PitchIQ — a fantasy Premier League draft app modeled on the official FPL draft mode.
 
 Audience:

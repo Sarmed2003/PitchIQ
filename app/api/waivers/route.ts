@@ -41,7 +41,6 @@ export async function POST(req: Request) {
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  // 20 claims / hour is comfortably above any normal use.
   const rl = await checkRateLimit(user.id, {
     key: "waiver-claim",
     limit: 20,
@@ -86,7 +85,6 @@ export async function POST(req: Request) {
   if (!team.league_id)
     return NextResponse.json({ error: "Team missing league" }, { status: 400 });
 
-  // Can't claim someone already rostered — they'd need a trade instead.
   const { data: rostered } = await supabase
     .from("teams")
     .select("id, roster_slots(player_id)")
@@ -105,7 +103,6 @@ export async function POST(req: Request) {
     );
   }
 
-  // If they're dropping someone, that player has to be on their team.
   if (drop_player_id != null) {
     const { data: ownsDrop } = await supabase
       .from("roster_slots")

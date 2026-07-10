@@ -9,8 +9,6 @@ import { AuthNavTransitionLink } from "@/components/landing/AuthNavTransitionLin
 
 const easeApple = [0.16, 1, 0.3, 1] as const;
 
-// The hero card drops in from off-screen first, then its inner pieces stagger
-// in once the card has landed. delayChildren matches the parent drop duration.
 const heroDropMotion = {
   hidden: { opacity: 0, y: -260, scale: 0.92, filter: "blur(20px)" },
   show: {

@@ -1,41 +1,34 @@
 import type { Json } from "@/types/database.types";
 
-// Defaults follow FPL almost exactly. Commissioners can override any of these
-// via leagues.scoring_system without a deploy.
+// Defaults follow FPL. Commissioners override any of these via
+// leagues.scoring_system.
 export const DEFAULT_SCORING_SYSTEM = {
-  // Appearance
   played_any: 1,
   played_60: 2,
 
-  // Goals (per position)
   goal_gk: 10,
   goal_def: 6,
   goal_mid: 5,
   goal_fwd: 4,
 
-  // Assists / contributions
   assist: 3,
 
-  // Defensive returns
   clean_sheet_gk: 4,
   clean_sheet_def: 4,
   clean_sheet_mid: 1,
   clean_sheet_fwd: 0,
   goals_conceded_per: 2,
-  goals_conceded_value: -1, // -1 per N goals conceded for GK + DEF
+  goals_conceded_value: -1,
 
-  // Discipline
   yellow_card: -1,
   red_card: -3,
   own_goal: -2,
   penalty_miss: -2,
   penalty_save: 5,
 
-  // Goalkeeper specific
   save_points_per: 3,
   save_point_value: 1,
 
-  // Bonus
   bonus_min: 1,
   bonus_max: 3,
 } as const;
@@ -63,9 +56,8 @@ export type ScoreBreakdown = {
   parts: Array<{ key: string; value: number; reason: string }>;
 };
 
-// Returns the total + a per-rule breakdown. The breakdown is what we show in
-// the player popover ("3 pts goal · 1 pt clean sheet · -1 yellow") and what
-// goes into scoring_audit so disputes have a paper trail.
+// Returns the total plus a per-rule breakdown, which is stored in
+// scoring_audit and surfaced in the player detail popover.
 export function calculateFantasyPointsBreakdown(
   raw: RawStatInput | null | undefined,
   position: string,
@@ -92,7 +84,6 @@ export function calculateFantasyPointsBreakdown(
   if (minutes > 0 && minutes < 60) add("appearance", s.played_any ?? 1, "Played < 60'");
   else if (minutes >= 60) add("played_60", s.played_60 ?? 2, "Played 60+ minutes");
 
-  // Goals are worth different points depending on position.
   const goals = raw.goals ?? 0;
   if (goals > 0) {
     const per =
@@ -109,7 +100,7 @@ export function calculateFantasyPointsBreakdown(
   const assists = raw.assists ?? 0;
   if (assists > 0) add("assists", assists * (s.assist ?? 3), `${assists} assist${assists > 1 ? "s" : ""}`);
 
-  // FPL rule: clean sheet only counts if they actually played 60'.
+  // FPL rule: clean sheet only counts with 60+ minutes played.
   if (raw.clean_sheet && minutes >= 60) {
     const csPts =
       pos === "GK"
@@ -122,7 +113,6 @@ export function calculateFantasyPointsBreakdown(
     if (csPts) add("clean_sheet", csPts, "Clean sheet");
   }
 
-  // GK and defenders lose a point per pair of goals conceded.
   if ((pos === "GK" || pos === "DEF") && (raw.goals_conceded ?? 0) > 0) {
     const per: number = s.goals_conceded_per ?? 2;
     const val: number = s.goals_conceded_value ?? -1;
@@ -149,7 +139,7 @@ export function calculateFantasyPointsBreakdown(
     add("saves", Math.floor(saves / per) * (s.save_point_value ?? 1), `${saves} saves`);
   }
 
-  // Cap bonus at 3 (FPL gives 1/2/3 to the top three players in each match).
+  // FPL bonus is 1/2/3 for the top three players per match.
   const bonus = raw.bonus_points ?? 0;
   if (bonus > 0) {
     const max = s.bonus_max ?? 3;
@@ -159,7 +149,6 @@ export function calculateFantasyPointsBreakdown(
   return breakdown;
 }
 
-// Drops the breakdown — kept for older callers that just want the total.
 export function calculateFantasyPoints(
   raw: RawStatInput | null | undefined,
   position: string,

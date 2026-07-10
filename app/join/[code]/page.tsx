@@ -12,7 +12,6 @@ export default async function JoinPage({ params }: Props) {
   const { code } = await params;
   const supabase = await createServerSupabaseClient();
 
-  // Look up league via existing invite-resolver RPC; tolerate misses.
   const { data: rows } = await supabase.rpc("get_league_by_invite", {
     code: code.trim(),
   });
@@ -23,13 +22,11 @@ export default async function JoinPage({ params }: Props) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // If the user is logged out, send them to sign up first; preserve the deep link.
   if (!user) {
     const next = `/join/${encodeURIComponent(code)}`;
     redirect(`/signup?next=${encodeURIComponent(next)}`);
   }
 
-  // Already a member? Bounce straight to the league hub.
   const { data: existing } = await supabase
     .from("teams")
     .select("id")

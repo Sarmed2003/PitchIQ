@@ -1,8 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database.types";
 
-// Service-role Supabase client. Bypasses RLS, so this stays server-only —
-// don't import from anything that ships to the browser.
+// Service-role client. Bypasses RLS — server-only.
 export function createAdminSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;

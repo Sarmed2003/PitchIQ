@@ -6,17 +6,14 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 type Props = {
-  // If set, behaves like a hard link. Otherwise we fall back to history.back()
-  // and only push to `fallbackHref` when there's no history (e.g. someone
-  // landed here directly from a share link).
+  // When set, always navigates to this URL. Otherwise the button goes
+  // back through history, falling back to `fallbackHref` if there is none.
   href?: string;
   fallbackHref?: string;
   label?: string;
   className?: string;
 };
 
-// Small, unobtrusive back affordance. Sits in a corner with a chevron + label,
-// big enough to thumb-press on phones but never the focal point of the screen.
 export function BackButton({
   href,
   fallbackHref = "/dashboard",

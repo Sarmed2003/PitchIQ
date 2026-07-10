@@ -1,4 +1,4 @@
-// Tiny logger so production builds don't spray console.* output.
+// debug + info are dev-only; warn + error log in all environments.
 const isDev = process.env.NODE_ENV === "development";
 
 export const logger = {

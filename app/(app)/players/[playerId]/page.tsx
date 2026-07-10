@@ -35,7 +35,6 @@ export default async function PlayerProfilePage({
 
   const chartData = [...(recentStats ?? [])].reverse();
 
-  // Build claimable-team payload + check whether this player is already on any roster.
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -57,7 +56,6 @@ export default async function PlayerProfilePage({
 
     const rows = (myTeams ?? []) as unknown as TeamRow[];
     if (rows.length > 0) {
-      // Check if player is rostered in any of these leagues.
       const leagueIds = [...new Set(rows.map((r) => r.league_id))];
       const { data: rostered } = await supabase
         .from("teams")
@@ -71,7 +69,6 @@ export default async function PlayerProfilePage({
         }
       }
 
-      // Fetch each team's roster (just the same-position players for the dropdown).
       const teamIds = rows.map((r) => r.id);
       const { data: rosterRows } = await supabase
         .from("roster_slots")

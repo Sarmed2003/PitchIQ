@@ -4,11 +4,10 @@ import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// Walks every league, sorts pending claims, awards the winner per player and
-// applies the add/drop. Two strategies depending on league.waiver_type:
-//   rolling → worst-ranked team wins, ties on priority then created_at
-//   faab    → highest bid wins, then priority, then created_at
-// FAAB budget deduction lands when we wire team budgets. Bearer-secret guarded.
+// Processes pending waiver claims per league.
+//   rolling: worst-ranked team wins, ties on priority then created_at.
+//   faab:    highest bid wins, then priority, then created_at.
+// Bearer-secret guarded; FAAB budget deduction is not yet implemented.
 export async function GET(req: Request) {
   const auth = req.headers.get("authorization") ?? "";
   const expected = `Bearer ${process.env.CRON_SECRET ?? ""}`;
@@ -51,7 +50,7 @@ export async function GET(req: Request) {
       });
     sortedTeams.forEach((t, i) => teamRank.set(t.id, i)); // 0 = worst = first pick
 
-    // Bucket by player — only one claim wins per player.
+    // One winner per player.
     const grouped = new Map<number, typeof pending>();
     for (const c of pending) {
       const key = c.add_player_id;
@@ -82,8 +81,8 @@ export async function GET(req: Request) {
       const winner = sorted[0];
       const losers = sorted.slice(1);
 
-      // Best-effort add/drop. If anything fails we mark the claim failed and
-      // move on so one bad row doesn't poison the whole league run.
+      // Best-effort add/drop; a single failure marks the claim failed
+      // without aborting the rest of the league's run.
       let success = true;
       let failureReason: string | null = null;
 

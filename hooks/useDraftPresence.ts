@@ -9,8 +9,7 @@ export type PresenceUser = {
   online_at: string;
 };
 
-// Tracks who's actually in the draft room via a Supabase presence channel.
-// Used to render the live "online" dot next to each manager.
+// Subscribes to a Supabase presence channel keyed to the league id.
 export function useDraftPresence(
   leagueId: string,
   me: { user_id: string; display_name: string | null } | null,

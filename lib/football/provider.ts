@@ -1,9 +1,6 @@
-/**
- * Adapter layer for whichever football data API we're paying for. Right now
- * we only ship the api-football (api-sports.io) implementation, but if we
- * swap to Sportmonks or Stats Perform the sync jobs above don't have to
- * change — they go through this interface.
- */
+// Adapter interface for the upstream football data API. Only the
+// api-football (api-sports.io) implementation ships today; sync jobs
+// consume this interface so switching providers is a one-file change.
 
 import { logger } from "@/lib/logger";
 
@@ -48,17 +45,10 @@ export type ProviderPlayerMatchStat = {
 
 export interface FootballDataProvider {
   name: string;
-  // Every PL player for a season. Implementations handle pagination internally.
   fetchAllPlayers(season: number): Promise<ProviderPlayer[]>;
-  // Fixtures for a season, optionally filtered to in-progress matches.
   fetchFixtures(season: number, opts?: { live?: boolean; gameweek?: number }): Promise<ProviderFixture[]>;
-  // Per-player stat lines for one fixture, feeds the scoring engine.
   fetchFixturePlayerStats(fixtureApiId: number): Promise<ProviderPlayerMatchStat[]>;
 }
-
-// -----------------------------------------------------------------------------
-// api-football.com adapter
-// -----------------------------------------------------------------------------
 
 const API_FOOTBALL_BASE = "https://v3.football.api-sports.io";
 const PL_LEAGUE = 39;
@@ -225,7 +215,7 @@ export function createApiFootballProvider(apiKey: string): FootballDataProvider 
             minutesPlayed: s.games?.minutes ?? 0,
             goals: s.goals?.total ?? 0,
             assists: s.goals?.assists ?? 0,
-            cleanSheet: false, // computed by scoring engine using fixture goals
+            cleanSheet: false,
             yellowCards: s.cards?.yellow ?? 0,
             redCards: s.cards?.red ?? 0,
             saves: s.goals?.saves ?? s.defense?.saves ?? 0,
@@ -238,10 +228,6 @@ export function createApiFootballProvider(apiKey: string): FootballDataProvider 
     },
   };
 }
-
-// -----------------------------------------------------------------------------
-// Default provider resolution from env
-// -----------------------------------------------------------------------------
 
 export function resolveProvider(): FootballDataProvider {
   const provider = process.env.FOOTBALL_API_PROVIDER ?? "api-football";

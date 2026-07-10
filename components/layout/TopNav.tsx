@@ -15,14 +15,9 @@ import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 import { usePathname, useRouter } from "next/navigation";
 import { BackButton } from "@/components/layout/BackButton";
 
-// Sticky header. On mobile we show the wordmark plus notifications and the
-// account menu; on desktop the sidebar already brands the page so we strip
-// it back to just the right-side actions.
 export function TopNav() {
   const router = useRouter();
   const pathname = usePathname();
-  // Dashboard is the "home" of the authed app, so a back button there is
-  // confusing. Everywhere else gets one.
   const showBack = pathname !== "/dashboard" && pathname !== "/";
 
   const { data: notifData } = useQuery({

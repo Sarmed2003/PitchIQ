@@ -7,11 +7,10 @@ import { logger } from "@/lib/logger";
 
 const schema = z.object({
   leagueId: z.string().uuid(),
-  // Seconds from now for the new pick deadline. Commissioner-only.
   extendSeconds: z.number().min(10).max(600).optional(),
 });
 
-// Lets the commissioner extend or reset the running pick clock.
+// Commissioner-only: extend or reset the running pick clock.
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createServerSupabaseClient();

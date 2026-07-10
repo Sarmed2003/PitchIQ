@@ -1,6 +1,5 @@
-// Per-team pre-pick list kept in localStorage. When the clock runs out the
-// server tries the queue top-down and falls back to the highest VOR/points
-// player still on the board.
+// Per-team pre-pick queue stored in localStorage. Consumed by the
+// autopick route when the pick clock expires.
 
 const KEY = (teamId: string) => `pitchiq:draft-queue:${teamId}`;
 
@@ -24,7 +23,7 @@ export function setQueue(teamId: string, ids: number[]): void {
   try {
     localStorage.setItem(KEY(teamId), JSON.stringify(ids));
   } catch {
-    // localStorage may be full or disabled; safe to swallow.
+    // Storage may be full or disabled.
   }
 }
 

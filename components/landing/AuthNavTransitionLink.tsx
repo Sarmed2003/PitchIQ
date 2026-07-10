@@ -11,8 +11,7 @@ type Props = {
   children: React.ReactNode;
 };
 
-// Animated nav into the auth pages — drops a frosted veil over the page,
-// flashes the wordmark, then pushes. Looks intentional instead of a hard cut.
+// Full-screen fade overlay before navigating to /login or /signup.
 export function AuthNavTransitionLink({ href, className, children }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);

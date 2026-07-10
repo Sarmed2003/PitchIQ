@@ -67,8 +67,6 @@ export async function PUT(req: Request, { params }: Params) {
   if (!team.league_id)
     return NextResponse.json({ error: "Team missing league" }, { status: 400 });
 
-  // 30 saves / 5 min is plenty for normal use and stops a stuck client from
-  // hammering Postgres.
   const rl = await checkRateLimit(user.id, {
     key: "lineup-edit",
     limit: 30,
@@ -81,7 +79,6 @@ export async function PUT(req: Request, { params }: Params) {
     );
   }
 
-  // Same Idempotency-Key → return the cached response.
   const idempotencyKey = req.headers.get("idempotency-key");
   if (idempotencyKey) {
     const cached = await readIdempotent(supabase, user.id, idempotencyKey);

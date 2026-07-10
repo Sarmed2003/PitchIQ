@@ -1,8 +1,8 @@
 import { Redis } from "@upstash/redis";
 import { Ratelimit } from "@upstash/ratelimit";
 
-// Returns null when Upstash isn't configured — most call sites fall back to
-// "no cache, no rate limit" so dev keeps working.
+// Returns null when Upstash env vars are missing so local dev works without
+// a Redis instance.
 export function getRedis(): Redis | null {
   const url = process.env.UPSTASH_REDIS_REST_URL;
   const token = process.env.UPSTASH_REDIS_REST_TOKEN;
@@ -12,8 +12,6 @@ export function getRedis(): Redis | null {
 
 const limiters = new Map<string, Ratelimit>();
 
-// Sliding-window limiter, cached per (key, limit, window) so we don't rebuild
-// the Upstash client on every request.
 export function getRateLimiter(
   key: string,
   limit: number,
@@ -34,8 +32,7 @@ export function getRateLimiter(
   return limiter;
 }
 
-// If Upstash isn't wired we just return success — the goal is "fail open" in
-// dev, not "block everything because env is missing."
+// Fails open when Upstash isn't configured.
 export async function checkRateLimit(
   identifier: string,
   options: { key: string; limit: number; windowSeconds: number },

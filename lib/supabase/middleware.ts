@@ -9,8 +9,7 @@ export type SessionUpdate = {
   supabase: SupabaseClient<Database> | null;
 };
 
-// Refreshes the Supabase auth cookie on every matching request. Runs on the
-// edge so it stays fast.
+// Refreshes the Supabase auth cookie on every matching request.
 export async function updateSession(request: NextRequest): Promise<SessionUpdate> {
   let supabaseResponse = NextResponse.next({
     request,

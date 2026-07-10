@@ -16,7 +16,6 @@ export type PlayersListPayload = {
   total: number;
 };
 
-// Player list fetcher used by the TanStack Query hook.
 export async function fetchPlayersPage(params: {
   page: number;
   limit?: number;

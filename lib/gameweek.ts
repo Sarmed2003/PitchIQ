@@ -1,6 +1,6 @@
-// Until we ingest the full fixture list, the active gameweek and lock deadline
-// live in `leagues.settings` (commissioner-managed). Single source of truth so
-// the rest of the app doesn't reach into that JSON directly.
+// Reads the commissioner-managed gameweek + lineup deadline from
+// leagues.settings. Callers should go through this helper rather than
+// reading the JSON directly.
 
 import type { Json } from "@/types/database.types";
 
@@ -33,8 +33,6 @@ export function readGameweekFromSettings(
   return {
     gameweek: Number.isFinite(gw) && gw > 0 ? gw : 1,
     deadline,
-    // No deadline set → editing stays open. Commissioners are expected to set
-    // one before kickoff.
     locked: deadline ? deadline.getTime() <= now.getTime() : false,
     season: typeof obj.season === "string" ? obj.season : SEASON,
   };

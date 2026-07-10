@@ -5,7 +5,7 @@ Things the senior-project spec commits to but the shipped app doesn't implement.
 ## Product features not implemented
 
 - **Stripe Connect prize pools + `/api/stripe/webhook`.** Out of scope for v1. No real money in the demo league. Because the endpoint doesn't exist, PCI SAQ-A scoping is moot — the app never sees a card number regardless.
-- **Resend transactional email + `pitchiq.app` sending domain with SPF/DKIM.** Invites use link + QR + native share instead. The `notify()` helper is wired for an email channel; the send path is intentionally not connected.
+- **Resend transactional email + `pitchiq.app` sending domain with SPF/DKIM.** Invites use link + QR + native share instead. No email transport is wired.
 - **VAPID web push notifications.** Manifest and service worker exist ([pitchiq/public/manifest.webmanifest](pitchiq/public/manifest.webmanifest), [pitchiq/public/sw.js](pitchiq/public/sw.js)), plumbing for `push_subscriptions` rows is in the schema, but there are no VAPID keys, no `web-push` server code, and no subscription registration UI.
 - **Google OAuth sign-in.** Email + password only. Adding Google is a Supabase dashboard toggle plus one button in [pitchiq/app/(auth)/login/](pitchiq/app/(auth)/login/); not enabled here.
 - **Async draft mode with 12-hour pick windows.** Live snake draft only. Migration and API surface for `draft_mode = 'async'` exists but no background worker sends "your pick" emails or auto-picks on window expiry.

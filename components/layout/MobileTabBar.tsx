@@ -20,8 +20,7 @@ const tabs = [
   { href: "/league/create", label: "Leagues", icon: Trophy },
 ] as const;
 
-// Bottom tab bar for phones / tablets. Hidden at lg+ where we use the
-// sidebar instead. Pads itself for the iPhone home indicator.
+// Mobile-only bottom nav. Sidebar takes over at lg+.
 export function MobileTabBar() {
   const pathname = usePathname();
   const reduce = useReducedMotion();

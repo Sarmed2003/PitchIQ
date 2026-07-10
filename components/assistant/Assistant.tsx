@@ -17,10 +17,8 @@ const QUICK_PROMPTS = [
   "What's a snake draft?",
 ];
 
-// Floating Coach bubble. Sits bottom-right, just above the mobile tab bar,
-// and stays mounted across navigations so the chat history survives moving
-// between pages. Closed = a small avatar; open = a glass panel with the
-// chat thread inside.
+// Persistent chat bubble anchored bottom-right, above the mobile tab bar.
+// Stays mounted across navigations so the thread survives route changes.
 export function Assistant() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");

@@ -1,10 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database, Json } from "@/types/database.types";
 
-// Lightweight idempotency layer. If the client sends an Idempotency-Key header
-// twice (flaky network, duplicate tap, etc.), we read the cached result on the
-// second call instead of re-running the mutation. PK is (user_id, key) so
-// concurrent retries collide cleanly.
+// Repeat requests carrying the same Idempotency-Key return the first
+// call's cached result. Primary key is (user_id, key).
 
 type DB = SupabaseClient<Database>;
 
