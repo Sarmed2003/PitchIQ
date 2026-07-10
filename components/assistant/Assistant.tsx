@@ -125,6 +125,9 @@ export function Assistant() {
             <div
               ref={scrollRef}
               className="flex-1 space-y-3 overflow-y-auto px-4 py-4 text-sm"
+              aria-live="polite"
+              aria-atomic="false"
+              aria-relevant="additions text"
             >
               {messages.length === 0 ? (
                 <div className="space-y-3">

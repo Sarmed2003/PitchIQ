@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { ServiceWorkerRegister } from "@/components/providers/sw-register";
 import { PostHogProvider } from "@/components/providers/posthog-provider";
+import { MotionProvider } from "@/components/providers/motion-provider";
 
 // Inter for body text and Inter Tight for display. Both are open-licensed
 // SF-inspired typefaces, so non-Apple devices get the same look macOS / iOS
@@ -65,11 +66,23 @@ export default function RootLayout({
   return (
     <html lang="en" className={`dark ${interSans.variable} ${interDisplay.variable}`}>
       <body className="min-h-dvh bg-background text-foreground antialiased">
-        <PostHogProvider>
-          <QueryProvider>
-            <TooltipProvider>{children}</TooltipProvider>
-          </QueryProvider>
-        </PostHogProvider>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-[var(--color-accent)] focus:px-4 focus:py-2 focus:font-medium focus:text-[var(--color-pitch)] focus:shadow-lg"
+        >
+          Skip to main content
+        </a>
+        <MotionProvider>
+          <PostHogProvider>
+            <QueryProvider>
+              <TooltipProvider>
+                <div id="main-content" tabIndex={-1} className="contents">
+                  {children}
+                </div>
+              </TooltipProvider>
+            </QueryProvider>
+          </PostHogProvider>
+        </MotionProvider>
         <ServiceWorkerRegister />
       </body>
     </html>
