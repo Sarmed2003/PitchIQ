@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { fail, ok } from "@/lib/api-response";
 import { logger } from "@/lib/logger";
 
@@ -21,46 +20,30 @@ export async function POST(request: NextRequest) {
     }
 
     const body = schema.parse(await request.json());
-    const admin = createAdminSupabaseClient();
-
-    const { data: trade } = await supabase.from("trades").select("*").eq("id", body.tradeId).single();
-
-    if (!trade || trade.status !== "pending") {
-      return NextResponse.json(fail("Trade not available", 400), { status: 400 });
-    }
-
-    const { data: recv } = await supabase
-      .from("teams")
-      .select("id, user_id")
-      .eq("id", trade.receiving_team_id ?? "")
-      .single();
-
-    if (!recv || recv.user_id !== user.id) {
-      return NextResponse.json(fail("Only the receiving manager can respond", 403), { status: 403 });
-    }
 
     if (!body.accept) {
-      await admin.from("trades").update({ status: "rejected", responded_at: new Date().toISOString() }).eq("id", body.tradeId);
+      // Reject: single UPDATE, no roster mutation, RLS handles authorisation.
+      const { error: rejErr } = await supabase
+        .from("trades")
+        .update({ status: "rejected", responded_at: new Date().toISOString() })
+        .eq("id", body.tradeId)
+        .eq("status", "pending");
+      if (rejErr) {
+        return NextResponse.json(fail(rejErr.message, 400), { status: 400 });
+      }
       return NextResponse.json(ok({ status: "rejected" }), { status: 200 });
     }
 
-    const { data: assets } = await admin.from("trade_assets").select("*").eq("trade_id", body.tradeId);
-
-    for (const a of assets ?? []) {
-      if (a.player_id == null || !a.from_team_id || !a.to_team_id) continue;
-      await admin.from("roster_slots").delete().eq("team_id", a.from_team_id).eq("player_id", a.player_id);
-      await admin.from("roster_slots").insert({
-        team_id: a.to_team_id,
-        player_id: a.player_id,
-        slot_type: "bench",
-        acquired_via: "trade",
-      });
+    // Accept: the swap runs inside a single Postgres transaction via RPC so a
+    // mid-swap failure cannot leave one team richer and the other poorer.
+    // The RPC verifies caller identity + trade state itself.
+    const { error: rpcErr } = await supabase.rpc("accept_trade", {
+      p_trade_id: body.tradeId,
+    });
+    if (rpcErr) {
+      const status = rpcErr.code === "42501" ? 403 : 400;
+      return NextResponse.json(fail(rpcErr.message, status), { status });
     }
-
-    await admin
-      .from("trades")
-      .update({ status: "accepted", responded_at: new Date().toISOString() })
-      .eq("id", body.tradeId);
 
     return NextResponse.json(ok({ status: "accepted" }), { status: 200 });
   } catch (e) {
