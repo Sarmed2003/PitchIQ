@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 
 type Props = {
   leagueId: string;
+  leagueName: string;
   maxTeams: number;
   rosterSize: number;
   tradeDeadline: string | null;
@@ -48,6 +49,7 @@ const GROUP_LABELS: Record<string, string> = {
 
 export function LeagueSettingsForm({
   leagueId,
+  leagueName,
   maxTeams,
   rosterSize,
   tradeDeadline,
@@ -64,6 +66,7 @@ export function LeagueSettingsForm({
     }
     return out;
   });
+  const [nameDraft, setNameDraft] = useState<string>(leagueName);
   const [maxTeamsDraft, setMaxTeamsDraft] = useState<number>(maxTeams);
   const [rosterSizeDraft, setRosterSizeDraft] = useState<number>(rosterSize);
   const [waiverDraft, setWaiverDraft] = useState<string>(waiverType ?? "reverse_standings");
@@ -88,6 +91,7 @@ export function LeagueSettingsForm({
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
+          name: nameDraft.trim(),
           maxTeams: maxTeamsDraft,
           rosterSize: rosterSizeDraft,
           waiverType: waiverDraft,
@@ -116,6 +120,18 @@ export function LeagueSettingsForm({
         Rules & scoring
       </h2>
       <form onSubmit={onSave} className="mt-5 space-y-6">
+        <div className="space-y-1.5">
+          <Label htmlFor="leagueName">League name</Label>
+          <Input
+            id="leagueName"
+            value={nameDraft}
+            onChange={(e) => setNameDraft(e.target.value)}
+            className="h-11"
+            maxLength={80}
+            required
+          />
+        </div>
+
         {/* Structure */}
         <div className="grid gap-3 sm:grid-cols-3">
           <div className="space-y-1.5">

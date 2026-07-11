@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeftRight, Check, X } from "lucide-react";
+import { ArrowLeftRight, Check, X, Ban } from "lucide-react";
 import { GlassCard } from "@/components/glass/GlassCard";
 import { GlassBadge } from "@/components/glass/GlassBadge";
 import { Button } from "@/components/ui/button";
@@ -36,6 +36,30 @@ export default function TradesPage() {
       if (!res.ok || json.error) throw new Error(json.error ?? "load");
       return json.data ?? [];
     },
+  });
+
+  const { data: myTeamIds = [] } = useQuery({
+    queryKey: ["my-team-ids"],
+    queryFn: async () => {
+      const res = await fetch("/api/league", { credentials: "include" });
+      const json = await res.json();
+      if (!res.ok || json.error) return [] as string[];
+      const rows = (json.data ?? []) as Array<{ id: string }>;
+      return rows.map((r) => r.id);
+    },
+  });
+
+  const cancel = useMutation({
+    mutationFn: async (tradeId: string) => {
+      const res = await fetch(`/api/trade/${tradeId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      const json = await res.json();
+      if (!res.ok || json.error) throw new Error(json.error ?? "cancel");
+      return json;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["trades"] }),
   });
 
   const respond = useMutation({
@@ -102,7 +126,12 @@ export default function TradesPage() {
           </div>
         ) : (
           <ul className="mt-4 space-y-2">
-            {pending.map((t) => (
+            {pending.map((t) => {
+              const isProposer =
+                t.proposing_team_id != null && myTeamIds.includes(t.proposing_team_id);
+              const isReceiver =
+                t.receiving_team_id != null && myTeamIds.includes(t.receiving_team_id);
+              return (
               <li
                 key={t.id}
                 className="hover-surface flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--color-glass-border)] bg-[var(--color-glass)] p-3 text-sm"
@@ -110,6 +139,15 @@ export default function TradesPage() {
                 <div className="min-w-0">
                   <p className="font-display text-sm font-semibold text-[var(--color-text-primary)]">
                     Trade <span className="font-mono text-[var(--color-accent)]">{t.id.slice(0, 8)}</span>
+                    {isProposer ? (
+                      <span className="ml-2 text-[10px] uppercase tracking-wide text-[var(--color-text-muted)]">
+                        · You sent
+                      </span>
+                    ) : isReceiver ? (
+                      <span className="ml-2 text-[10px] uppercase tracking-wide text-[var(--color-accent-2)]">
+                        · Incoming
+                      </span>
+                    ) : null}
                   </p>
                   <p className="text-[11px] text-[var(--color-text-muted)]">
                     {t.expires_at
@@ -118,28 +156,44 @@ export default function TradesPage() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    disabled={respond.isPending}
-                    onClick={() => respond.mutate({ tradeId: t.id, accept: false })}
-                    className="tap-target gap-1 border-[var(--color-glass-border)]"
-                  >
-                    <X className="size-3.5" /> Decline
-                  </Button>
-                  <Button
-                    type="button"
-                    size="sm"
-                    disabled={respond.isPending}
-                    onClick={() => respond.mutate({ tradeId: t.id, accept: true })}
-                    className="tap-target gap-1"
-                  >
-                    <Check className="size-3.5" /> Accept
-                  </Button>
+                  {isProposer ? (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      disabled={cancel.isPending}
+                      onClick={() => cancel.mutate(t.id)}
+                      className="tap-target gap-1 border-[var(--color-glass-border)]"
+                    >
+                      <Ban className="size-3.5" /> Cancel
+                    </Button>
+                  ) : isReceiver ? (
+                    <>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        disabled={respond.isPending}
+                        onClick={() => respond.mutate({ tradeId: t.id, accept: false })}
+                        className="tap-target gap-1 border-[var(--color-glass-border)]"
+                      >
+                        <X className="size-3.5" /> Decline
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        disabled={respond.isPending}
+                        onClick={() => respond.mutate({ tradeId: t.id, accept: true })}
+                        className="tap-target gap-1"
+                      >
+                        <Check className="size-3.5" /> Accept
+                      </Button>
+                    </>
+                  ) : null}
                 </div>
               </li>
-            ))}
+            );
+            })}
           </ul>
         )}
       </GlassCard>

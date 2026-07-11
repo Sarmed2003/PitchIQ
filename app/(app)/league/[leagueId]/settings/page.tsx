@@ -4,6 +4,7 @@ import { GlassCard } from "@/components/glass/GlassCard";
 import { LeagueSettingsForm } from "@/components/league/LeagueSettingsForm";
 import { InvitePanel } from "@/components/league/InvitePanel";
 import { SyncPlayersButton } from "@/components/league/SyncPlayersButton";
+import { LeagueDangerZone } from "@/components/league/LeagueDangerZone";
 import { DEFAULT_SCORING_SYSTEM } from "@/lib/draft/scoring";
 
 export default async function LeagueSettingsPage({
@@ -53,6 +54,7 @@ export default async function LeagueSettingsPage({
       <div className="grid gap-4 lg:grid-cols-2 lg:gap-6">
         <LeagueSettingsForm
           leagueId={leagueId}
+          leagueName={league.name}
           maxTeams={league.max_teams ?? 10}
           rosterSize={league.roster_size ?? 15}
           tradeDeadline={league.trade_deadline}
@@ -83,6 +85,8 @@ export default async function LeagueSettingsPage({
           </GlassCard>
         </div>
       </div>
+
+      <LeagueDangerZone leagueId={leagueId} leagueName={league.name} />
     </div>
   );
 }

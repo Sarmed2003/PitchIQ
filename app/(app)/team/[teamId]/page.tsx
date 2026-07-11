@@ -7,6 +7,7 @@ import { PitchVisualizer, type PitchPlayer } from "@/components/team/PitchVisual
 import { JerseyToken } from "@/components/players/JerseyToken";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { TeamActionsPanel } from "@/components/team/TeamActionsPanel";
 import { formatPoints } from "@/lib/utils/format";
 
 export default async function TeamPage({
@@ -31,7 +32,7 @@ export default async function TeamPage({
 
   const { data: leagueRow } = await supabase
     .from("leagues")
-    .select("id, name")
+    .select("id, name, commissioner_id")
     .eq("id", team.league_id)
     .maybeSingle();
 
@@ -91,6 +92,7 @@ export default async function TeamPage({
 
   const isMine = team.user_id === user.id;
   const league = leagueRow;
+  const isCommissioner = league?.commissioner_id === user.id;
 
   return (
     <div className="space-y-4 lg:space-y-6">
@@ -241,6 +243,16 @@ export default async function TeamPage({
           </ul>
         )}
       </GlassCard>
+
+      {(isMine || isCommissioner) ? (
+        <TeamActionsPanel
+          teamId={team.id}
+          teamName={team.team_name}
+          leagueId={team.league_id}
+          isOwner={isMine}
+          isCommissioner={isCommissioner}
+        />
+      ) : null}
     </div>
   );
 }

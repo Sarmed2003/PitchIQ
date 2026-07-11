@@ -6,6 +6,7 @@ import { logger } from "@/lib/logger";
 import type { Database } from "@/types/database.types";
 
 const schema = z.object({
+  name: z.string().min(2).max(80).optional(),
   maxTeams: z.number().min(2).max(20).optional(),
   rosterSize: z.number().min(11).max(25).optional(),
   waiverType: z.string().min(1).max(40).optional(),
@@ -42,6 +43,7 @@ export async function PATCH(
 
     const body = schema.parse(await request.json());
     const update: Database["public"]["Tables"]["leagues"]["Update"] = {};
+    if (body.name !== undefined) update.name = body.name;
     if (body.maxTeams !== undefined) update.max_teams = body.maxTeams;
     if (body.rosterSize !== undefined) update.roster_size = body.rosterSize;
     if (body.waiverType !== undefined) update.waiver_type = body.waiverType;
