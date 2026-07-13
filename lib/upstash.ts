@@ -32,13 +32,18 @@ export function getRateLimiter(
   return limiter;
 }
 
-// Fails open when Upstash isn't configured.
+// Fails open when Upstash isn't configured or Redis is unreachable.
 export async function checkRateLimit(
   identifier: string,
   options: { key: string; limit: number; windowSeconds: number },
 ): Promise<{ success: boolean; remaining?: number; reset?: number }> {
   const limiter = getRateLimiter(options.key, options.limit, options.windowSeconds);
   if (!limiter) return { success: true };
-  const res = await limiter.limit(identifier);
-  return { success: res.success, remaining: res.remaining, reset: res.reset };
+  try {
+    const res = await limiter.limit(identifier);
+    return { success: res.success, remaining: res.remaining, reset: res.reset };
+  } catch (err) {
+    console.error("[upstash] rate limit check failed, failing open:", err);
+    return { success: true };
+  }
 }

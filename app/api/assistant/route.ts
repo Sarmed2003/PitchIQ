@@ -33,15 +33,27 @@ export async function POST(req: Request) {
     return new Response("Slow down — try again in a minute.", { status: 429 });
   }
 
-  const { messages }: { messages: UIMessage[] } = await req.json();
+  let body: { messages: UIMessage[] };
+  try {
+    body = await req.json();
+  } catch {
+    return new Response("Invalid request body.", { status: 400 });
+  }
 
-  const result = streamText({
-    model: MODEL,
-    system: SYSTEM_PROMPT,
-    messages: await convertToModelMessages(messages),
-    tools: buildAssistantTools(supabase, user.id),
-    stopWhen: stepCountIs(5),
-  });
+  try {
+    const result = streamText({
+      model: MODEL,
+      system: SYSTEM_PROMPT,
+      messages: await convertToModelMessages(body.messages),
+      tools: buildAssistantTools(supabase, user.id),
+      stopWhen: stepCountIs(5),
+    });
 
-  return result.toUIMessageStreamResponse();
+    return result.toUIMessageStreamResponse();
+  } catch (err) {
+    console.error("[assistant] stream failed:", err);
+    return new Response("Coach is temporarily unavailable. Try again shortly.", {
+      status: 503,
+    });
+  }
 }
