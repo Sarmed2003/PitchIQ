@@ -2,10 +2,12 @@ import { Redis } from "@upstash/redis";
 import { Ratelimit } from "@upstash/ratelimit";
 
 // Returns null when Upstash env vars are missing so local dev works without
-// a Redis instance.
+// a Redis instance. Supports both native Upstash names and Vercel KV integration.
 export function getRedis(): Redis | null {
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  const url =
+    process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
+  const token =
+    process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
   if (!url || !token) return null;
   return new Redis({ url, token });
 }
