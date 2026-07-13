@@ -148,17 +148,21 @@ export function Assistant() {
                 </div>
               ) : null}
 
-              {messages.map((m) => (
-                <div
-                  key={m.id}
-                  className={cn(
-                    "max-w-[88%] rounded-2xl px-3.5 py-2 leading-relaxed",
-                    m.role === "user"
-                      ? "ml-auto bg-[var(--color-accent)]/85 text-[var(--color-pitch)]"
-                      : "mr-auto bg-[var(--color-glass)] text-[var(--color-text-primary)]",
-                  )}
-                >
-                  {m.parts.map((part, i) => {
+              {messages.map((m) => {
+                const textParts = m.parts.filter((part) => part.type === "text");
+                if (textParts.length === 0) return null;
+
+                return (
+                  <div
+                    key={m.id}
+                    className={cn(
+                      "max-w-[88%] rounded-2xl px-3.5 py-2 leading-relaxed",
+                      m.role === "user"
+                        ? "ml-auto bg-[var(--color-accent)]/85 text-[var(--color-pitch)]"
+                        : "mr-auto bg-[var(--color-glass)] text-[var(--color-text-primary)]",
+                    )}
+                  >
+                    {textParts.map((part, i) => {
                     if (part.type === "text") {
                       return (
                         <span key={i} className="whitespace-pre-wrap">
@@ -167,9 +171,10 @@ export function Assistant() {
                       );
                     }
                     return null;
-                  })}
-                </div>
-              ))}
+                    })}
+                  </div>
+                );
+              })}
 
               {status === "submitted" ? (
                 <div className="mr-auto max-w-[60%] rounded-2xl bg-[var(--color-glass)] px-3.5 py-2 text-[var(--color-text-muted)]">
