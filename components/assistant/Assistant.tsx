@@ -166,16 +166,6 @@ export function Assistant() {
                         </span>
                       );
                     }
-                    if (part.type.startsWith("tool-")) {
-                      return (
-                        <span
-                          key={i}
-                          className="block text-[10px] uppercase tracking-[0.18em] text-[var(--color-text-muted)]"
-                        >
-                          · checking {part.type.replace("tool-", "")}
-                        </span>
-                      );
-                    }
                     return null;
                   })}
                 </div>
