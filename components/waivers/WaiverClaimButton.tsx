@@ -91,7 +91,7 @@ export function WaiverClaimButton({ player, teams, alreadyRostered }: Props) {
       <AnimatePresence>
         {open ? (
           <motion.div
-            className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-3 backdrop-blur-md sm:items-center"
+            className="fixed inset-0 z-50 flex items-end justify-center overflow-y-auto bg-black/60 p-3 backdrop-blur-md sm:items-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -105,7 +105,7 @@ export function WaiverClaimButton({ player, teams, alreadyRostered }: Props) {
               animate={{ y: 0, opacity: 1 }}
               exit={reduce ? undefined : { y: 40, opacity: 0 }}
               transition={{ type: "spring", stiffness: 320, damping: 28 }}
-              className="w-full max-w-md space-y-4 rounded-2xl border border-[var(--color-glass-border)] bg-[var(--color-glass)] p-5 backdrop-blur-2xl shadow-2xl"
+              className="my-auto max-h-[calc(100dvh-1.5rem)] w-full max-w-md space-y-4 overflow-y-auto rounded-2xl border border-[var(--color-glass-border)] bg-[var(--color-surface)]/95 p-5 shadow-2xl backdrop-blur-2xl"
             >
               <div>
                 <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--color-accent)]">
@@ -184,7 +184,7 @@ export function WaiverClaimButton({ player, teams, alreadyRostered }: Props) {
               </div>
 
               {error ? (
-                <p className="rounded-lg border border-[var(--color-danger)]/40 bg-[var(--color-danger)]/10 p-2 text-sm text-[var(--color-text-primary)]">
+                <p className="rounded-lg border border-[var(--color-accent-danger)]/40 bg-[var(--color-accent-danger)]/10 p-2 text-sm text-[var(--color-text-primary)]">
                   {error}
                 </p>
               ) : null}
